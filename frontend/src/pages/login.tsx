@@ -1,17 +1,32 @@
-import { SetStateAction, useState } from 'react';
+import { SetStateAction, useCallback, useEffect, useState } from 'react';
 import Input from '@/components/input';
 import Image from 'next/image';
 import logo from '../assets/logo.png';
 import InputPassword from '@/components/inputPassword';
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 const AuthPage = () => {
 	const [email, setEmail] = useState('');
 	const [isValidEmail, setIsValidEmail] = useState(true);
 	const [password, setPassword] = useState('');
 	const [isValidPassword, setIsValidPassword] = useState(true);
-	// const [rememberMe, setRememberMe] = useState('true'); botão lembre-se de mim, criar funcionalidade
+	const [rememberMe, setRememberMe] = useState(false);
 	const [isVisible, setIsVisible] = useState(true);
+
+	useEffect(() => {
+		const checkSavedUser = () => {
+			const data = localStorage.getItem('nextflix_login');
+
+			if (data) {
+				const { email, password } = JSON.parse(data);
+				setEmail(email);
+				setPassword(password);
+			}
+		};
+
+		checkSavedUser();
+	})
 
 	const regexEmail = /^\w+(-?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -39,6 +54,21 @@ const AuthPage = () => {
 		}
 	};
 
+	const login = useCallback(() => {
+		const user = {
+			email,
+			password,
+		};
+
+		if (rememberMe) {
+			localStorage.setItem('nextflix_login', JSON.stringify(user))
+		} else {
+			localStorage.removeItem('nextflix_login');
+		};
+	}, [rememberMe, email, password]);
+
+	console.log(rememberMe);
+
 	return (
 		<div className="relative w-full bg-[url('../assets/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
 			<div className='bg-black w-full h-full md:bg-opacity-50'>
@@ -51,7 +81,7 @@ const AuthPage = () => {
 					/>
 				</nav>
 				<div className='flex justify-center'>
-					<div className='bg-black bg-opacity-70 px-[5%] md:px-16 md:py-16 self-center mt-2 md:w-[450px] rounded-md w-full'>
+					<div className='bg-black bg-opacity-70 px-[5%] md:px-16 md:py-16 self-center mt-2 md:w-[450px] rounded-md w-full mb-20'>
 						<h2 className='text-white text-4xl mb-8 font-semibold'>Entrar</h2>
 						<div className='flex flex-col gap-4 mb-8'>
 							<div>
@@ -84,7 +114,11 @@ const AuthPage = () => {
 								)}
 							</div>
 							<div>
-								<button className='bg-[#e50914] py-3 text-white font-semibold rounded-md w-full mt-4 transition'>
+								<button
+									disabled
+									onClick={login}
+									className='bg-[#e50914] py-3 text-white font-semibold rounded-md w-full mt-4 transition disabled:opacity-30'
+								>
 									Entrar
 								</button>
 							</div>
@@ -94,6 +128,7 @@ const AuthPage = () => {
 										id='checkbox'
 										type='checkbox'
 										className='form-checkbox h-5 w-5 rounded transition duration-150 ease-in-out'
+										onChange={() => setRememberMe(!rememberMe)}
 									/>
 									<label
 										htmlFor='checkbox'
@@ -131,7 +166,11 @@ const AuthPage = () => {
 							)}
 						</p>
 						<div>
-							<p className={`text-xs text-gray-400 mt-4 ${!isVisible ? 'opacity-1000 transition-opacity' : 'opacity-0'}`}>
+							<p
+								className={`text-xs text-gray-400 mt-4 ${
+									!isVisible ? 'opacity-1000 transition-opacity' : 'opacity-0'
+								}`}
+							>
 								As informações recolhidas pelo Google reCAPTCHA estão sujeitas à{' '}
 								<Link
 									className='text-blue-500 hover:underline'
@@ -158,6 +197,7 @@ const AuthPage = () => {
 					</div>
 				</div>
 			</div>
+			<Footer />
 		</div>
 	);
 };
