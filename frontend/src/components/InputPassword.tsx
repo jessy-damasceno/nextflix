@@ -1,4 +1,4 @@
-import Input from './input';
+import Input from './Input';
 import { FC, useCallback, useState } from 'react';
 
 interface InputPasswordProps {

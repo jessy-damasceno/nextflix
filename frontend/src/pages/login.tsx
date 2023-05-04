@@ -1,12 +1,17 @@
 import { SetStateAction, useCallback, useEffect, useState } from 'react';
-import Input from '@/components/input';
+import { useRouter } from "next/router"
+import Input from '@/components/Input';
 import Image from 'next/image';
 import logo from '../assets/logo.png';
-import InputPassword from '@/components/inputPassword';
+import InputPassword from '@/components/InputPassword';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
+import { validateEmail } from '@/utils/isValidEmail';
+import { signIn } from 'next-auth/react';
 
 const AuthPage = () => {
+	const router = useRouter();
+
 	const [email, setEmail] = useState('');
 	const [isValidEmail, setIsValidEmail] = useState(true);
 	const [password, setPassword] = useState('');
@@ -26,19 +31,12 @@ const AuthPage = () => {
 		};
 
 		checkSavedUser();
-	})
-
-	const regexEmail = /^\w+(-?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+	});
 
 	const mailChange = (ev: { target: { value: SetStateAction<string> } }) => {
 		const newValue = ev.target.value;
-		setEmail(ev.target.value);
-
-		if (regexEmail.test(newValue as string)) {
-			setIsValidEmail(true);
-		} else {
-			setIsValidEmail(false);
-		}
+		setEmail(newValue);
+		setIsValidEmail(validateEmail(newValue as string));
 	};
 
 	const passWordChange = (ev: {
@@ -54,7 +52,7 @@ const AuthPage = () => {
 		}
 	};
 
-	const login = useCallback(() => {
+	const login = useCallback(async () => {
 		const user = {
 			email,
 			password,
@@ -65,9 +63,20 @@ const AuthPage = () => {
 		} else {
 			localStorage.removeItem('nextflix_login');
 		};
-	}, [rememberMe, email, password]);
 
-	console.log(rememberMe);
+		try {
+			await signIn('credentials', {
+				email,
+				password,
+				redirect: false,
+				callbackUrl: '/',
+			});
+
+			router.push('/');
+		} catch (err) {
+			console.log(err);
+		}
+	}, [email, password, rememberMe, router]);
 
 	return (
 		<div className="relative w-full bg-[url('../assets/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
@@ -147,7 +156,7 @@ const AuthPage = () => {
 						<div className='mt-8 text-gray-500'>
 							<div>
 								{`Novo por aqui? `}
-								<Link href='/'>
+								<Link href='/register'>
 									<span className='text-gray-200'>Assine agora</span>
 								</Link>
 								.
