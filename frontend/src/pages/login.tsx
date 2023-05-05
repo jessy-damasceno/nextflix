@@ -77,7 +77,6 @@ const AuthPage = () => {
 	};
 
 	const login = useCallback(async () => {
-		console.log(email, password);
 		if (!email && !password) {
 			setIsValidEmail(false);
 			setIsValidPassword(false);
@@ -103,7 +102,6 @@ const AuthPage = () => {
 				callbackUrl: '/',
 			});
 
-			console.log(response);
 			if (response?.ok) {
 				router.push('/');
 			} else {
