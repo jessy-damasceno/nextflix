@@ -31,7 +31,7 @@ export default NextAuth({
         });
 
         if(!user || !user.hashedPassword) {
-          throw new Error('Invalid email or password');
+          throw new Error('User not found');
         }
 
         const isCorrectPassword = await compare(

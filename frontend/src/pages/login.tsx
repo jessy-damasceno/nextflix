@@ -1,5 +1,5 @@
 import { SetStateAction, useCallback, useEffect, useState } from 'react';
-import { useRouter } from "next/router"
+import { useRouter } from 'next/router';
 import Input from '@/components/Input';
 import Image from 'next/image';
 import logo from '../assets/logo.png';
@@ -18,6 +18,7 @@ const AuthPage = () => {
 	const [isValidPassword, setIsValidPassword] = useState(true);
 	const [rememberMe, setRememberMe] = useState(false);
 	const [isVisible, setIsVisible] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
 		const checkSavedUser = () => {
@@ -31,7 +32,7 @@ const AuthPage = () => {
 		};
 
 		checkSavedUser();
-	});
+	}, []);
 
 	const mailChange = (ev: { target: { value: SetStateAction<string> } }) => {
 		const newValue = ev.target.value;
@@ -53,28 +54,40 @@ const AuthPage = () => {
 	};
 
 	const login = useCallback(async () => {
+		console.log(email, password);
+		if (!email && !password) {
+				setIsValidEmail(false);
+				setIsValidPassword(false);
+				return;
+		}
 		const user = {
 			email,
 			password,
 		};
 
 		if (rememberMe) {
-			localStorage.setItem('nextflix_login', JSON.stringify(user))
+			localStorage.setItem('nextflix_login', JSON.stringify(user));
 		} else {
 			localStorage.removeItem('nextflix_login');
-		};
+		}
 
 		try {
-			await signIn('credentials', {
+			setIsLoading(true);
+			const response = await signIn('credentials', {
 				email,
 				password,
 				redirect: false,
 				callbackUrl: '/',
+
 			});
 
-			router.push('/');
+			console.log(response)
+			if (response?.ok) router.push('/');
+
 		} catch (err) {
 			console.log(err);
+		} finally {
+			setIsLoading(false);
 		}
 	}, [email, password, rememberMe, router]);
 
@@ -124,7 +137,7 @@ const AuthPage = () => {
 							</div>
 							<div>
 								<button
-									disabled
+									disabled={isLoading}
 									onClick={login}
 									className='bg-[#e50914] py-3 text-white font-semibold rounded-md w-full mt-4 transition disabled:opacity-30'
 								>
@@ -177,7 +190,7 @@ const AuthPage = () => {
 						<div>
 							<p
 								className={`text-xs text-gray-400 mt-4 ${
-									!isVisible ? 'opacity-1000 transition-opacity' : 'opacity-0'
+									!isVisible ? 'transition duration-300 ease-in-out opacity-100' : 'invisible opacity-0'
 								}`}
 							>
 								As informações recolhidas pelo Google reCAPTCHA estão sujeitas à{' '}
