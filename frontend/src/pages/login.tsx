@@ -8,6 +8,28 @@ import Link from 'next/link';
 import Footer from '@/components/Footer';
 import { validateEmail } from '@/utils/isValidEmail';
 import { signIn } from 'next-auth/react';
+import ErrorBox from '@/components/ErrorBox';
+
+interface ERRORS {
+  bold?: string;
+  text: string;
+  linkText: string;
+  href: string;
+}
+
+const LOG_ERRORS = {
+  'User not found': {
+    text: 'Desculpe, não encontramos uma conta com esse endereço de email. Tente novamente ou',
+    linkText: 'crie uma nova conta',
+    href: '/',
+  },
+  'Invalid password': {
+    bold: 'Senha incorreta.',
+    text: 'Tente novamente ou',
+    linkText: 'redefina sua senha',
+    href: '/loginHelp',
+  }
+}
 
 const AuthPage = () => {
 	const router = useRouter();
@@ -19,6 +41,7 @@ const AuthPage = () => {
 	const [rememberMe, setRememberMe] = useState(false);
 	const [isVisible, setIsVisible] = useState(true);
 	const [isLoading, setIsLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<ERRORS | null>(null);
 
 	useEffect(() => {
 		const checkSavedUser = () => {
@@ -56,9 +79,9 @@ const AuthPage = () => {
 	const login = useCallback(async () => {
 		console.log(email, password);
 		if (!email && !password) {
-				setIsValidEmail(false);
-				setIsValidPassword(false);
-				return;
+			setIsValidEmail(false);
+			setIsValidPassword(false);
+			return;
 		}
 		const user = {
 			email,
@@ -78,12 +101,16 @@ const AuthPage = () => {
 				password,
 				redirect: false,
 				callbackUrl: '/',
-
 			});
 
-			console.log(response)
-			if (response?.ok) router.push('/');
-
+			console.log(response);
+			if (response?.ok) {
+				router.push('/');
+			} else {
+				setPassword('');
+				setIsValidPassword(false);
+				setErrorMessage(LOG_ERRORS[response?.error as keyof typeof LOG_ERRORS] || null)
+			}
 		} catch (err) {
 			console.log(err);
 		} finally {
@@ -106,6 +133,11 @@ const AuthPage = () => {
 					<div className='bg-black bg-opacity-70 px-[5%] md:px-16 md:py-16 self-center mt-2 md:w-[450px] rounded-md w-full mb-20'>
 						<h2 className='text-white text-4xl mb-8 font-semibold'>Entrar</h2>
 						<div className='flex flex-col gap-4 mb-8'>
+							{errorMessage && (
+								<div>
+									<ErrorBox { ...errorMessage } />
+								</div>
+							)}
 							<div>
 								<Input
 									label='Email'
@@ -190,7 +222,9 @@ const AuthPage = () => {
 						<div>
 							<p
 								className={`text-xs text-gray-400 mt-4 ${
-									!isVisible ? 'transition duration-300 ease-in-out opacity-100' : 'invisible opacity-0'
+									!isVisible
+										? 'transition duration-300 ease-in-out opacity-100'
+										: 'invisible opacity-0'
 								}`}
 							>
 								As informações recolhidas pelo Google reCAPTCHA estão sujeitas à{' '}

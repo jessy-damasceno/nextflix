@@ -40,7 +40,7 @@ export default NextAuth({
         );
 
         if (!isCorrectPassword) {
-          throw new Error('Invalid email or password');
+          throw new Error('Invalid password');
         }
 
         return user;
