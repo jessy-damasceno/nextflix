@@ -9,27 +9,28 @@ import Footer from '@/components/Footer';
 import { validateEmail } from '@/utils/isValidEmail';
 import { signIn } from 'next-auth/react';
 import ErrorBox from '@/components/ErrorBox';
+import Loading from '@/components/Loading';
 
 interface ERRORS {
-  bold?: string;
-  text: string;
-  linkText: string;
-  href: string;
+	bold?: string;
+	text: string;
+	linkText: string;
+	href: string;
 }
 
 const LOG_ERRORS = {
-  'User not found': {
-    text: 'Desculpe, não encontramos uma conta com esse endereço de email. Tente novamente ou',
-    linkText: 'crie uma nova conta',
-    href: '/',
-  },
-  'Invalid password': {
-    bold: 'Senha incorreta.',
-    text: 'Tente novamente ou',
-    linkText: 'redefina sua senha',
-    href: '/loginHelp',
-  }
-}
+	'User not found': {
+		text: 'Desculpe, não encontramos uma conta com esse endereço de email. Tente novamente ou',
+		linkText: 'crie uma nova conta',
+		href: '/',
+	},
+	'Invalid password': {
+		bold: 'Senha incorreta.',
+		text: 'Tente novamente ou',
+		linkText: 'redefina sua senha',
+		href: '/loginHelp',
+	},
+};
 
 const AuthPage = () => {
 	const router = useRouter();
@@ -107,7 +108,9 @@ const AuthPage = () => {
 			} else {
 				setPassword('');
 				setIsValidPassword(false);
-				setErrorMessage(LOG_ERRORS[response?.error as keyof typeof LOG_ERRORS] || null)
+				setErrorMessage(
+					LOG_ERRORS[response?.error as keyof typeof LOG_ERRORS] || null
+				);
 			}
 		} catch (err) {
 			console.log(err);
@@ -133,7 +136,7 @@ const AuthPage = () => {
 						<div className='flex flex-col gap-4 mb-8'>
 							{errorMessage && (
 								<div>
-									<ErrorBox { ...errorMessage } />
+									<ErrorBox {...errorMessage} />
 								</div>
 							)}
 							<div>
@@ -165,13 +168,13 @@ const AuthPage = () => {
 									</span>
 								)}
 							</div>
-							<div>
+							<div className='relative'>
 								<button
 									disabled={isLoading}
 									onClick={login}
 									className='bg-[#e50914] py-3 text-white font-semibold rounded-md w-full mt-4 transition disabled:opacity-30'
 								>
-									Entrar
+									{isLoading ? <Loading /> : 'Entrar'}
 								</button>
 							</div>
 							<div className='flex justify-between w-full items-center'>
