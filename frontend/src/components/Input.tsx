@@ -38,7 +38,7 @@ const Input: FC<InputProps> = ({
           pb-1
           w-full
           text-nd
-          ${!isValid ? 'border-b-2 border-orange-500' : ''}
+          ${!isValid ? 'border-b-2 border-amber-600' : ''}
           text-white
           bg-neutral-800
           appearance-none

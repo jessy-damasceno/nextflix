@@ -116,7 +116,7 @@ const AuthPage = () => {
 									isValid={isValidEmail}
 								/>
 								{!isValidEmail && (
-									<span className='text-orange-500 text-xs'>
+									<span className='text-amber-600 text-xs'>
 										Informe um email válido.
 									</span>
 								)}
@@ -130,7 +130,7 @@ const AuthPage = () => {
 									isValid={isValidPassword}
 								/>
 								{!isValidPassword && (
-									<span className='text-orange-500 text-xs'>
+									<span className='text-amber-600 text-xs'>
 										A senha deve ter entre 4 e 60 caracteres.
 									</span>
 								)}
