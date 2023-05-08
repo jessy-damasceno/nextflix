@@ -7,11 +7,12 @@ import InputPassword from '@/components/InputPassword';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
 import { validateEmail } from '@/utils/isValidEmail';
-import { signIn } from 'next-auth/react';
+import { getSession, signIn } from 'next-auth/react';
 import ErrorBox from '@/components/ErrorBox';
 import Loading from '@/components/Loading';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
+import { NextPageContext } from 'next';
 
 interface ERRORS {
 	bold?: string;
@@ -34,6 +35,24 @@ const LOG_ERRORS = {
 	},
 };
 
+export async function getServerSideProps(context: NextPageContext) {
+	const session = await getSession(context);
+
+	if (session) {
+		return {
+			props: {},
+			redirect: {
+				destination: '/browse',
+				permanent: true,
+			},
+		};
+	}
+
+	return {
+		props: {},
+	};
+}
+
 const AuthPage = () => {
 	const router = useRouter();
 
@@ -54,6 +73,7 @@ const AuthPage = () => {
 				const { email, password } = JSON.parse(data);
 				setEmail(email);
 				setPassword(password);
+				setRememberMe(true);
 			}
 		};
 
@@ -90,12 +110,6 @@ const AuthPage = () => {
 			password,
 		};
 
-		if (rememberMe) {
-			localStorage.setItem('nextflix_login', JSON.stringify(user));
-		} else {
-			localStorage.removeItem('nextflix_login');
-		}
-
 		try {
 			setIsLoading(true);
 			const response = await signIn('credentials', {
@@ -106,6 +120,11 @@ const AuthPage = () => {
 			});
 
 			if (response?.ok) {
+				if (rememberMe) {
+					localStorage.setItem('nextflix_login', JSON.stringify(user));
+				} else {
+					localStorage.removeItem('nextflix_login');
+				}
 				router.push('/browse');
 			} else {
 				setPassword('');
@@ -185,6 +204,7 @@ const AuthPage = () => {
 									<input
 										id='checkbox'
 										type='checkbox'
+										checked={rememberMe}
 										className='form-checkbox h-5 w-5 rounded transition duration-150 ease-in-out'
 										onChange={() => setRememberMe(!rememberMe)}
 									/>
