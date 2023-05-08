@@ -106,7 +106,7 @@ const AuthPage = () => {
 			});
 
 			if (response?.ok) {
-				router.push('/');
+				router.push('/browse');
 			} else {
 				setPassword('');
 				setIsValidPassword(false);
@@ -129,7 +129,8 @@ const AuthPage = () => {
 						src={logo}
 						alt='Logo'
 						height={32}
-						className='sm:w-48 ml-[3%]'
+						className='sm:w-48 ml-[3%] cursor-pointer'
+						onClick={() => router.push('/')}
 					/>
 				</nav>
 				<div className='flex justify-center'>
