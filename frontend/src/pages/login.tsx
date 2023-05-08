@@ -2,7 +2,7 @@ import { SetStateAction, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Input from '@/components/Input';
 import Image from 'next/image';
-import logo from '../assets/logo.png';
+import logo from 'public/assets/logo.png';
 import InputPassword from '@/components/InputPassword';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
@@ -42,7 +42,7 @@ export async function getServerSideProps(context: NextPageContext) {
 		return {
 			props: {},
 			redirect: {
-				destination: '/browse',
+				destination: '/profiles',
 				permanent: true,
 			},
 		};
@@ -125,7 +125,7 @@ const AuthPage = () => {
 				} else {
 					localStorage.removeItem('nextflix_login');
 				}
-				router.push('/browse');
+				router.push('/profiles');
 			} else {
 				setPassword('');
 				setIsValidPassword(false);
@@ -141,7 +141,7 @@ const AuthPage = () => {
 	}, [email, password, rememberMe, router]);
 
 	return (
-		<div className="relative w-full bg-[url('../assets/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
+		<div className="relative w-full bg-[url('/assets/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
 			<div className='bg-black w-full h-full md:bg-opacity-50'>
 				<nav className='py-4'>
 					<Image
@@ -224,13 +224,13 @@ const AuthPage = () => {
 						</div>
 						<div className='flex flex-row items-center gap-4 mt-8 justify-center'>
 							<div
-								onClick={() => signIn('google', { callbackUrl: '/' })}
+								onClick={() => signIn('google', { callbackUrl: '/profiles' })}
 								className='w-10 h-10 bg-white rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition'
 							>
 								<FcGoogle size={24} />
 							</div>
 							<div
-								onClick={() => signIn('github', { callbackUrl: '/' })}
+								onClick={() => signIn('github', { callbackUrl: '/profiles' })}
 								className='w-10 h-10 bg-white rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition'
 							>
 								<FaGithub size={24} />
