@@ -2,6 +2,9 @@ import { NextPageContext } from 'next';
 import { getSession, signOut } from 'next-auth/react';
 
 import useCurrentUser from '@/hooks/useCurrentUser';
+import Navbar from '@/components/NavBar';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export async function getServerSideProps(context: NextPageContext) {
 	const session = await getSession(context);
@@ -21,15 +24,28 @@ export async function getServerSideProps(context: NextPageContext) {
 }
 
 export default function Home() {
-  const { data: user } = useCurrentUser();
+	const [clientWindowHeight, setClientWindowHeight] = useState(0);
+	const { data: user } = useCurrentUser();
+
+	function getMultipleOfTen(num: number): number {
+		const multipleOfTen = Math.floor(num / 10) * 10;
+		return Math.max(0, Math.min(100, multipleOfTen));
+	}
+
+	useEffect(() => {
+		const handleScroll = () => {
+			const newValue: number = getMultipleOfTen(window.scrollY);
+			setClientWindowHeight(newValue);
+		};
+
+		window.addEventListener('scroll', handleScroll);
+
+		return () => window.removeEventListener('scroll', handleScroll);
+	}, []);
 
 	return (
 		<>
-			<h1 className='text-4xl text-green-500'>NEXTFLIX</h1>
-      <p className='text-white'>Logged in as: {user?.email}</p>
-			<button className='h-10 w-full bg-white' onClick={() => signOut()}>
-				SAIR!
-			</button>
+			<Navbar transparencyHeight={clientWindowHeight} />
 		</>
 	);
 }
