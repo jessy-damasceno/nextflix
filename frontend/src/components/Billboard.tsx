@@ -12,7 +12,6 @@ const Billboard = () => {
 				autoPlay
 				muted
 				loop
-				controls
 				src={data?.videoUrl}
 			/>
 			<div className='absolute top-[30%] md:top-[40%] ml-4 md:ml-16'>
