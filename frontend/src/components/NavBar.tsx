@@ -10,6 +10,8 @@ import NavbarItem from './NavbarItem';
 import MobileMenu from './MobileMenu';
 import AccountMenu from './AccountMenu';
 
+const TOP_OFFSET = 66;
+
 interface Props {
   transparencyHeight?: number;
 }
@@ -17,6 +19,7 @@ interface Props {
 const Navbar: FC<Props> = ({ transparencyHeight }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [showBackground, setShowBackground] = useState(false);
 
   const navRef: any = useRef();
   const accountMenuRef: any = useRef();
@@ -39,6 +42,22 @@ const Navbar: FC<Props> = ({ transparencyHeight }) => {
       document.removeEventListener('mousedown', handler);
     }
   }, [])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY >= TOP_OFFSET) {
+        setShowBackground(true)
+      } else {
+        setShowBackground(false)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
   
 
   const toggleMobileMenu = useCallback(() => {
@@ -51,7 +70,7 @@ const Navbar: FC<Props> = ({ transparencyHeight }) => {
 
 	return (
 		<nav className='w-full fixed z-50'>
-			<div className={`px-2 md:px-12 py-4 flex flex-row items-center transition bg-zinc-900 bg-opacity-${transparencyHeight}`}>
+			<div className={`px-4 md:px-16 py-6 flex flex-row items-center transition duration-500 ${showBackground ? 'bg-zinc-900 bg-opacity-90' : ''}`}>
 				<Image className='w-24 lg:w-28' src={logo} alt='Nextflix logo' />
         <div className='flex-row ml-8 gap-7 hidden lg:flex'>
           <NavbarItem label='Início' />
